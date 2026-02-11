@@ -1,0 +1,28 @@
+{
+  "name": "@gitton-dev/types",
+  "version": "0.1.21",
+  "description": "TypeScript type definitions for Gitton plugins",
+  "main": "gitton-plugin.d.ts",
+  "types": "gitton-plugin.d.ts",
+  "files": [
+    "gitton-plugin.d.ts",
+    "README.md"
+  ],
+  "keywords": [
+    "gitton",
+    "gitton-plugin",
+    "typescript",
+    "types"
+  ],
+  "author": "godai",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:gitton-dev/gitton-plugins.git",
+    "directory": "packages/types"
+  },
+  "bugs": {
+    "url": "https://github.com/gitton-dev/gitton-plugins/issues"
+  },
+  "homepage": "https://jsers.dev/service/gitton"
+}

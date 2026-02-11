@@ -1,0 +1,23 @@
+{
+  "name": "@gitton-dev/plugins",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Gitton plugins monorepo",
+  "scripts": {
+    "build": "turbo build",
+    "dev": "turbo dev",
+    "lint": "turbo lint",
+    "clean": "turbo clean",
+    "publish:all": "pnpm build && pnpm -r publish --access public"
+  },
+  "devDependencies": {
+    "turbo": "^2.4.4"
+  },
+  "packageManager": "pnpm@9.15.4",
+  "author": "godai",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:gitton-dev/gitton-plugins.git"
+  }
+}
