@@ -32,3 +32,4 @@ pnpm-debug.log*
 # Cache
 .cache/
 *.cache
+assets/
