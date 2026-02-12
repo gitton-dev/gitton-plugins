@@ -13,22 +13,29 @@ export const availablePlugins: PluginInfo[] = [
   {
     "name": "@gitton-dev/plugin-dependency-graph",
     "shortName": "dependency-graph",
-    "version": "0.0.2",
+    "version": "0.0.6",
     "description": "Visualize import/require dependencies between files",
     "displayName": "Dependency Graph"
   },
   {
     "name": "@gitton-dev/plugin-git-hooks",
     "shortName": "git-hooks",
-    "version": "0.0.2",
+    "version": "0.0.6",
     "description": "Manage Git hooks with a visual interface",
     "displayName": "Git Hooks"
   },
   {
     "name": "@gitton-dev/plugin-github-actions",
     "shortName": "github-actions",
-    "version": "0.0.2",
+    "version": "0.0.6",
     "description": "View and trigger GitHub Actions workflows",
     "displayName": "GitHub Actions"
+  },
+  {
+    "name": "@gitton-dev/plugin-zenn-markdown",
+    "shortName": "zenn-markdown",
+    "version": "0.0.3",
+    "description": "Render markdown with Zenn-style syntax (:::message, :::details, @[youtube], etc.)",
+    "displayName": "Zenn Markdown"
   }
 ]

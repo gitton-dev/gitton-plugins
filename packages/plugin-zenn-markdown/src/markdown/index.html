@@ -6,6 +6,123 @@
     <title>Zenn Markdown Preview</title>
   </head>
   <body>
+    <style>
+    body {
+        margin: 0;
+        font-family: var(--font-base);
+        color: var(--c-text-body);
+        word-break: break-word;
+        word-wrap: break-word;
+        background: var(--c-bg-base);
+        line-break: strict;
+        text-size-adjust: none
+    }
+:root[data-theme=dark-blue] {
+    color-scheme: dark;
+    --c-blue-800: #0656ac;
+    --c-blue-900: #05458a;
+    --c-blue-1000: #043467;
+    --c-dark-blue-800: #09376d;
+    --c-dark-blue-900: #0b2c53;
+    --c-dark-blue-1000: #162c49;
+    --c-dark-blue-1100: #0d223a;
+    --c-dark-blue-1200: #081d35;
+    --c-dark-gray-900: #344c69;
+    --c-dark-gray-1000: #2e445c;
+    --c-dark-gray-1100: #1b324a;
+    --c-dark-purple-900: #3b384b;
+    --c-dark-purple-1000: #312f42;
+    --c-red-600: #e05252;
+    --c-red-800: #903f3f;
+    --c-red-1000: #311818;
+    --c-general-primary: var(--c-blue-600);
+    --c-general-secondary: #7e44c0;
+    --c-general-alert: var(--c-red-600);
+    --c-general-like: #f76685;
+    --c-button-primary-bg: var(--c-blue-700);
+    --c-button-primary-fg: var(--c-blue-200);
+    --c-button-primary-hover-bg: var(--c-blue-600);
+    --c-button-secondary-bg: var(--c-bg-base);
+    --c-button-secondary-fg: var(--c-text-body);
+    --c-button-secondary-border: var(--c-neutral-border);
+    --c-button-secondary-hover-bg: var(--c-dark-blue-800);
+    --c-button-secondary-grayed-bg: var(--c-dark-blue-900);
+    --c-button-secondary-grayed-fg: var(--c-text-body);
+    --c-button-secondary-grayed-border: var(--c-neutral-border);
+    --c-button-secondary-grayed-hover-bg: var(--c-dark-blue-800);
+    --c-button-tertiary-fg: var(--c-blue-500);
+    --c-button-tertiary-hover-bg: var(--c-dark-blue-800);
+    --c-button-quaternary-fg: var(--c-text-body);
+    --c-button-quaternary-hover-bg: var(--c-dark-blue-800);
+    --c-button-quaternary-disabled-fg: var(--c-text-lower-priority);
+    --c-button-danger-bg: var(--c-dark-blue-900);
+    --c-button-danger-fg: var(--c-general-alert);
+    --c-button-danger-border: var(--c-general-alert);
+    --c-button-danger-hover-bg: var(--c-bg-alert);
+    --c-button-danger-forcus-border: var(--c-general-alert);
+    --c-button-follow-bg: var(--c-dark-blue-900);
+    --c-button-follow-fg: var(--c-text-body);
+    --c-button-follow-border: var(--c-neutral-border);
+    --c-button-follow-hover-bg: #09376d;
+    --c-button-following-bg: #09376d;
+    --c-button-following-fg: var(--c-text-body);
+    --c-button-following-border: var(--c-neutral-border);
+    --c-button-share-bg: var(--c-dark-blue-900);
+    --c-button-share-fg: var(--c-text-lower-priority);
+    --c-button-share-border: var(--c-neutral-border);
+    --c-button-share-hover-bg: #09376d;
+    --c-button-share-hover-fg: var(--c-text-body);
+    --c-label-primary-bg: var(--c-bg-base);
+    --c-label-primary-fg: var(--c-blue-500);
+    --c-label-primary-painted-bg: var(--c-general-primary);
+    --c-label-primary-painted-fg: var(--c-text-body);
+    --c-label-secondary-bg: var(--c-bg-base);
+    --c-label-secondary-fg: var(--c-general-secondary);
+    --c-label-secondary-painted-bg: var(--c-general-secondary);
+    --c-label-secondary-painted-fg: var(--c-text-body);
+    --c-label-low-priority-bg: var(--c-bg-base);
+    --c-label-low-priority-fg: var(--c-text-lower-priority);
+    --c-label-low-priority-painted-bg: #09376d;
+    --c-label-low-priority-painted-fg: var(--c-text-body);
+    --c-label-alert-painted-bg: var(--c-general-alert);
+    --c-label-alert-painted-fg: var(--c-text-body);
+    --c-message-box-info-bg: #13395d;
+    --c-message-box-info-border: #0f66ad;
+    --c-message-box-info-icon-bg: var(--c-general-primary);
+    --c-message-box-warn-bg: #39352c;
+    --c-message-box-warn-border: #8a7345;
+    --c-message-box-warn-icon-bg: #ffa909;
+    --c-message-box-error-bg: var(--c-bg-alert);
+    --c-message-box-error-border: var(--c-red-800);
+    --c-message-box-error-icon-bg: var(--c-general-alert);
+    --c-form-text: var(--c-text-body);
+    --c-form-input-bg: var(--c-dark-blue-900);
+    --c-form-input-bg-lighter: var(--c-dark-blue-900);
+    --c-text-body: #ecf5ff;
+    --c-text-low-priority: #a4bcd5;
+    --c-text-lower-priority: #7a9cc6;
+    --c-text-link-primary: var(--c-blue-500);
+    --c-text-link-visited: #abb1b6;
+    --c-bg-base: var(--c-dark-blue-1200);
+    --c-bg-base-rgb: 8 29 53;
+    --c-bg-base-outer: var(--c-dark-blue-1200);
+    --c-bg-base-inner: var(--c-dark-blue-1100);
+    --c-bg-emoji: var(--c-dark-blue-900);
+    --c-bg-emoji-primary: var(--c-dark-blue-900);
+    --c-bg-neutral: var(--c-dark-blue-800);
+    --c-bg-neutral-lighter: var(--c-dark-blue-900);
+    --c-bg-neutral-lightest: var(--c-dark-blue-1000);
+    --c-bg-primary: var(--c-blue-900);
+    --c-bg-primary-lighter: var(--c-blue-1000);
+    --c-bg-secondary: var(--c-dark-purple-1000);
+    --c-bg-alert: var(--c-red-1000);
+    --c-bg-like: #392c3f;
+    --c-bg-popover: var(--c-blue-1000);
+    --c-bg-backdrop: rgb(0 0 0/50%);
+    --c-neutral-border: var(--c-dark-gray-1000);
+    --c-neutral-border-lighter: var(--c-dark-gray-1100)
+}
+    </style>
     <div id="root"></div>
     <script type="module" src="./main.ts"></script>
   </body>
