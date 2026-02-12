@@ -419,6 +419,30 @@ function initEditor(container: HTMLElement) {
     }
   })
 
+  // Add Cmd+S / Ctrl+S to save
+  editor.addAction({
+    id: 'save-file',
+    label: 'Save File',
+    keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS],
+    run: async () => {
+      if (!currentFilename || typeof window.gitton === 'undefined') return
+      try {
+        const content = editor.getValue()
+        await window.gitton.fs.writeFile(currentFilename, content)
+        window.gitton.ui.showNotification(`Saved: ${currentFilename}`, 'info')
+        // Notify parent that file was saved
+        window.parent.postMessage({
+          type: 'saved',
+          content,
+          filename: currentFilename
+        }, '*')
+      } catch (e) {
+        console.error('[Monaco] Failed to save:', e)
+        window.gitton.ui.showNotification(`Failed to save: ${e}`, 'error')
+      }
+    }
+  })
+
   return editor
 }
 
@@ -426,20 +450,38 @@ function initEditor(container: HTMLElement) {
 function setContent(content: string, filename: string) {
   if (!editor) return
 
-  currentFilename = filename
   const language = detectLanguage(filename)
-
-  // Create a proper URI for the model
   const uri = monaco.Uri.parse(`file:///${filename}`)
 
-  // Dispose existing model if any
-  const existingModel = monaco.editor.getModel(uri)
-  if (existingModel) {
-    existingModel.dispose()
+  // Check if we're updating the same file
+  const currentModel = editor.getModel()
+  if (currentModel && currentFilename === filename) {
+    // Same file - only update if content actually changed
+    // Preserve cursor position and selection
+    if (currentModel.getValue() !== content) {
+      const position = editor.getPosition()
+      const selections = editor.getSelections()
+      currentModel.setValue(content)
+      if (position) editor.setPosition(position)
+      if (selections) editor.setSelections(selections)
+    }
+    return
   }
 
-  // Create new model with proper URI
-  const model = monaco.editor.createModel(content, language, uri)
+  currentFilename = filename
+
+  // Different file - create or get model
+  let model = monaco.editor.getModel(uri)
+  if (model) {
+    // Model exists, update content if different
+    if (model.getValue() !== content) {
+      model.setValue(content)
+    }
+  } else {
+    // Create new model
+    model = monaco.editor.createModel(content, language, uri)
+  }
+
   editor.setModel(model)
 
   // Load the current file and its imports into the type system

@@ -16,7 +16,8 @@
     "author": "Gitton Team",
     "permissions": [
       "ui:editor",
-      "git:read"
+      "git:read",
+      "git:write"
     ],
     "extensionPoints": {
       "editor": {
