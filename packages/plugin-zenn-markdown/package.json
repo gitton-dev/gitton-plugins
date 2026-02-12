@@ -41,7 +41,7 @@
         },
         {
           "domain": "https://embed.zenn.studio",
-          "types": ["frame"],
+          "types": ["frame", "script"],
           "description": "Zenn embed server (card, tweet, gist, mermaid)"
         },
         {
