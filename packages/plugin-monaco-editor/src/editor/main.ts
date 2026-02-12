@@ -237,38 +237,121 @@ async function loadPackageTypes(packageName: string): Promise<void> {
   }
 }
 
+// Track processed dependencies to avoid infinite loops
+const processedDeps = new Set<string>()
+
+// Get type definitions based on package.json dependencies (like techup-lessons approach)
+async function getTypeDefinitions(exclude: string[] = []): Promise<void> {
+  if (typeof window.gitton === 'undefined') return
+
+  try {
+    const packageJsonContent = await window.gitton.fs.readFile('package.json')
+    const packageJson = JSON.parse(packageJsonContent)
+    const dependencies = {
+      ...packageJson.dependencies,
+      ...packageJson.devDependencies
+    }
+
+    // Process each dependency
+    for (const dep of Object.keys(dependencies)) {
+      if (!exclude.includes(dep)) {
+        await getDependencyTypes(dep, 'node_modules')
+      }
+    }
+  } catch (e) {
+    console.warn('[Monaco] Failed to read package.json:', e)
+  }
+}
+
+// Recursively get dependency types
+async function getDependencyTypes(dep: string, nodeModulesPath: string): Promise<void> {
+  if (typeof window.gitton === 'undefined') return
+  if (processedDeps.has(dep)) return
+  processedDeps.add(dep)
+
+  const depPath = `${nodeModulesPath}/${dep}`
+  const packageJsonPath = `${depPath}/package.json`
+
+  try {
+    // Check if package exists
+    if (!await window.gitton.fs.exists(packageJsonPath)) return
+
+    // Read package.json to get sub-dependencies
+    const depPackageJsonContent = await window.gitton.fs.readFile(packageJsonPath)
+    const depPackageJson = JSON.parse(depPackageJsonContent)
+
+    // Recursively process sub-dependencies
+    const subDeps = {
+      ...depPackageJson.dependencies,
+      ...depPackageJson.peerDependencies
+    }
+    for (const subDep of Object.keys(subDeps || {})) {
+      await getDependencyTypes(subDep, nodeModulesPath)
+    }
+
+    // Find .d.ts and package.json files in the dependency
+    await findAndAddDtsFiles(depPath)
+
+    // Also check @types package
+    const typeDepPath = `${nodeModulesPath}/@types/${dep}`
+    if (await window.gitton.fs.exists(typeDepPath)) {
+      await findAndAddDtsFiles(typeDepPath)
+    }
+  } catch {
+    // Skip packages that can't be processed
+  }
+}
+
+// Find and add .d.ts files from a directory
+async function findAndAddDtsFiles(dir: string, maxDepth = 5, currentDepth = 0): Promise<void> {
+  if (typeof window.gitton === 'undefined') return
+  if (currentDepth > maxDepth) return
+
+  try {
+    if (!await window.gitton.fs.exists(dir)) return
+
+    const entries = await window.gitton.fs.readdir(dir)
+
+    for (const entry of entries) {
+      if (entry.name.startsWith('.')) continue
+
+      const fullPath = `${dir}/${entry.name}`
+
+      if (entry.isDirectory) {
+        // Skip heavy/unnecessary directories
+        if (['test', 'tests', '__tests__', 'examples', 'docs', 'node_modules'].includes(entry.name)) continue
+        await findAndAddDtsFiles(fullPath, maxDepth, currentDepth + 1)
+      } else if (entry.name.endsWith('.d.ts') || entry.name === 'package.json') {
+        try {
+          const content = await window.gitton.fs.readFile(fullPath)
+          if (content.length < 500 * 1024) { // Skip files > 500KB
+            // Remove node_modules/ prefix for the module path
+            const modulePath = fullPath.replace(/^node_modules\//, '')
+            await addFileToMonaco(modulePath, content)
+          }
+        } catch {
+          // Skip unreadable files
+        }
+      }
+    }
+  } catch {
+    // Directory doesn't exist or can't be read
+  }
+}
+
 // Load all type definitions from node_modules
 async function loadAllNodeModulesTypes(): Promise<void> {
   if (typeof window.gitton === 'undefined') return
 
-  console.log('[Monaco] Loading node_modules types...')
+  console.log('[Monaco] Loading node_modules types from package.json...')
 
-  // Priority packages to load first
-  const priorityPackages = [
-    'react', 'react-dom', 'node',
-    'react-router-dom', 'react-i18next',
-    'lucide-react', 'sonner'
-  ]
-
-  // Load priority packages
-  for (const pkg of priorityPackages) {
-    await loadPackageTypes(pkg)
-  }
-
-  // Load all @types packages
-  try {
-    const typesDir = 'node_modules/@types'
-    if (await window.gitton.fs.exists(typesDir)) {
-      const entries = await window.gitton.fs.readdir(typesDir)
-      for (const entry of entries) {
-        if (entry.isDirectory && !priorityPackages.includes(entry.name)) {
-          await loadPackageTypes(entry.name)
-        }
-      }
-    }
-  } catch (e) {
-    console.warn('[Monaco] Failed to load @types:', e)
-  }
+  // Use the techup-lessons approach: read package.json and recursively load types
+  await getTypeDefinitions([
+    // Exclude packages that are too large or cause issues
+    'typescript',
+    'esbuild',
+    'vite'
+  ])
 
   console.log('[Monaco] Finished loading node_modules types')
 }
@@ -411,11 +494,11 @@ function initEditor(container: HTMLElement) {
   editor.onDidChangeModelContent(() => {
     if (editor) {
       const content = editor.getValue()
-      window.parent.postMessage({
+      window.gitton.postMessage.send({
         type: 'contentChanged',
         content,
         filename: currentFilename
-      }, '*')
+      })
     }
   })
 
@@ -431,11 +514,11 @@ function initEditor(container: HTMLElement) {
         await window.gitton.fs.writeFile(currentFilename, content)
         window.gitton.ui.showNotification(`Saved: ${currentFilename}`, 'info')
         // Notify parent that file was saved
-        window.parent.postMessage({
+        window.gitton.postMessage.send({
           type: 'saved',
           content,
           filename: currentFilename
-        }, '*')
+        })
       } catch (e) {
         console.error('[Monaco] Failed to save:', e)
         window.gitton.ui.showNotification(`Failed to save: ${e}`, 'error')
@@ -506,11 +589,11 @@ window.addEventListener('message', (event) => {
       break
 
     case 'getContent':
-      window.parent.postMessage({
+      window.gitton.postMessage.send({
         type: 'content',
         content: getContent(),
         filename: currentFilename
-      }, '*')
+      })
       break
 
     case 'theme':
@@ -552,4 +635,4 @@ initTypeSystem().then(() => {
 })
 
 // Signal ready
-window.parent.postMessage({ type: 'ready' }, '*')
+window.gitton.postMessage.send({ type: 'ready' })
