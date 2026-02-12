@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Zenn Markdown Settings</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+      padding: 16px;
+      margin: 0;
+      background: transparent;
+      color: #1a1a1a;
+      font-size: 14px;
+    }
+
+    .dark body {
+      color: #e5e5e5;
+    }
+
+    h2 {
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin: 0 0 16px 0;
+    }
+
+    .setting {
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .setting label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+    }
+
+    .setting input[type="checkbox"] {
+      width: 16px;
+      height: 16px;
+      cursor: pointer;
+    }
+
+    .description {
+      font-size: 0.75rem;
+      color: #666;
+      margin-left: 24px;
+      margin-top: 4px;
+    }
+
+    .dark .description {
+      color: #999;
+    }
+
+    .info {
+      margin-top: 24px;
+      padding: 12px;
+      background: rgba(59, 130, 246, 0.1);
+      border-radius: 6px;
+      font-size: 0.75rem;
+    }
+
+    .dark .info {
+      background: rgba(59, 130, 246, 0.15);
+    }
+
+    .info h3 {
+      font-size: 0.875rem;
+      font-weight: 600;
+      margin: 0 0 8px 0;
+    }
+
+    .info ul {
+      margin: 0;
+      padding-left: 20px;
+    }
+
+    .info li {
+      margin-bottom: 4px;
+    }
+
+    .info code {
+      background: rgba(0, 0, 0, 0.1);
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-family: 'SF Mono', 'Monaco', 'Inconsolata', monospace;
+      font-size: 0.75rem;
+    }
+
+    .dark .info code {
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .status {
+      margin-top: 16px;
+      padding: 8px 12px;
+      background: rgba(34, 197, 94, 0.1);
+      border-radius: 6px;
+      color: #16a34a;
+      font-size: 0.75rem;
+    }
+
+    .dark .status {
+      background: rgba(34, 197, 94, 0.15);
+      color: #4ade80;
+    }
+  </style>
+</head>
+<body>
+  <h2>Zenn Markdown</h2>
+
+  <div class="status">
+    Plugin is enabled. Markdown files will be rendered with Zenn-style syntax.
+  </div>
+
+  <div class="info">
+    <h3>Supported Syntax</h3>
+    <ul>
+      <li><code>:::message</code> - Message box</li>
+      <li><code>:::message alert</code> - Alert box (red)</li>
+      <li><code>:::details title</code> - Collapsible section</li>
+      <li><code>@[youtube](videoId)</code> - YouTube embed</li>
+      <li><code>@[tweet](url)</code> - Twitter/X embed</li>
+      <li><code>@[github](url)</code> - GitHub file embed</li>
+      <li><code>@[gist](url)</code> - GitHub Gist embed</li>
+      <li><code>@[card](url)</code> - Link card</li>
+      <li><code>@[slideshare](key)</code> - SlideShare embed</li>
+      <li><code>@[speakerdeck](key)</code> - Speaker Deck embed</li>
+      <li><code>@[codepen](url)</code> - CodePen embed</li>
+      <li><code>@[codesandbox](url)</code> - CodeSandbox embed</li>
+      <li><code>@[stackblitz](url)</code> - StackBlitz embed</li>
+      <li><code>@[figma](url)</code> - Figma embed</li>
+      <li><code>@[mermaid](code)</code> - Mermaid diagram</li>
+      <li><code>$formula$</code> - Inline math (KaTeX)</li>
+      <li><code>$$formula$$</code> - Block math (KaTeX)</li>
+      <li><code>![](image.jpg =300x200)</code> - Image with size</li>
+    </ul>
+  </div>
+
+  <script>
+    // Wait for gitton SDK to be available
+    function init() {
+      if (!window.gitton) {
+        setTimeout(init, 100);
+        return;
+      }
+
+      // Apply theme
+      window.addEventListener('gitton:contextchange', (e) => {
+        if (e.detail.theme === 'dark') {
+          document.documentElement.classList.add('dark');
+        } else {
+          document.documentElement.classList.remove('dark');
+        }
+      });
+    }
+
+    init();
+  </script>
+</body>
+</html>

@@ -5,10 +5,9 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build && vite build --config vite.renderer.config.ts",
-    "build:renderer": "vite build --config vite.renderer.config.ts",
+    "build": "vite build",
     "preview": "vite preview",
-    "clean": "rm -rf dist node_modules/.vite"
+    "clean": "rm -rf ui node_modules/.vite"
   },
   "gitton": {
     "displayName": "Zenn Markdown",
@@ -26,7 +25,7 @@
           "*.mdx"
         ],
         "priority": 10,
-        "entry": "dist/renderer.js"
+        "entry": "ui/src/markdown/index.html"
       },
       "settingsTab": {
         "entry": "ui/src/settings/index.html",
@@ -35,7 +34,6 @@
     }
   },
   "files": [
-    "dist",
     "ui",
     "package.json"
   ],

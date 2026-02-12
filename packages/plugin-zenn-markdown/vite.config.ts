@@ -1,15 +1,37 @@
 import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
-import path from 'path'
+import { resolve } from 'path'
+import { nodePolyfills } from 'vite-plugin-node-polyfills'
 
-/**
- * Vite config for building the settings UI
- */
 export default defineConfig({
-  plugins: [react()],
-  root: path.resolve(__dirname, 'ui/src/settings'),
+  plugins: [
+    nodePolyfills({
+      include: ['crypto', 'stream', 'buffer', 'process', 'events', 'util'],
+      globals: {
+        Buffer: true,
+        global: true,
+        process: true
+      }
+    })
+  ],
+  base: './',
   build: {
-    outDir: path.resolve(__dirname, 'dist/settings'),
-    emptyDirOnBuild: true
+    outDir: 'ui',
+    emptyOutDir: true,
+    rollupOptions: {
+      input: {
+        markdown: resolve(__dirname, 'src/markdown/index.html'),
+        settings: resolve(__dirname, 'src/settings/index.html')
+      },
+      output: {
+        entryFileNames: 'assets/[name]-[hash].js',
+        chunkFileNames: 'assets/[name]-[hash].js',
+        assetFileNames: 'assets/[name]-[hash].[ext]'
+      }
+    }
+  },
+  resolve: {
+    alias: {
+      '@': resolve(__dirname, 'src')
+    }
   }
 })
