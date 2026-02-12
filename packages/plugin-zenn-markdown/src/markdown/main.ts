@@ -42,7 +42,7 @@ window.addEventListener('message', async (event) => {
 
       // Send height back to parent for auto-resize
       const height = document.body.scrollHeight
-      window.parent.postMessage({ type: 'resize', height }, '*')
+      window.gitton.postMessage.send({ type: 'resize', height })
     } catch (error) {
       console.error('Render error:', error)
       root.innerHTML = '<pre style="color:red;">' + (error as Error).message + '</pre>'
@@ -61,13 +61,12 @@ window.addEventListener('gitton:contextchange', (event) => {
 })
 
 // Apply initial theme from Gitton context (if available)
-declare const gitton: { context?: { theme?: string } } | undefined
-if (typeof gitton !== 'undefined' && gitton?.context?.theme) {
-  applyTheme(gitton.context.theme)
+if (typeof window.gitton !== 'undefined' && window.gitton?.context?.theme) {
+  applyTheme(window.gitton.context.theme)
 }
 
 // Signal ready
-window.parent.postMessage({ type: 'ready' }, '*')
+window.gitton.postMessage.send({ type: 'ready' })
 
 // Load Zenn embed script
 const script = document.createElement('script')

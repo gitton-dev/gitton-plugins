@@ -311,6 +311,45 @@ export interface GhAPI {
 }
 
 /**
+ * PostMessage API for safe communication with parent window
+ */
+export interface PostMessageAPI {
+  /**
+   * Send a message to the parent window with proper origin
+   * @param data - Message data to send
+   * @example
+   * gitton.postMessage.send({ type: 'contentChanged', content: '...' });
+   */
+  send(data: Record<string, unknown>): void
+
+  /**
+   * Listen for messages from the parent window by type
+   * @param messageType - The message type to listen for
+   * @param handler - Handler function called when message is received
+   * @returns Unsubscribe function
+   * @example
+   * const unsubscribe = gitton.postMessage.on('setContent', (data) => {
+   *   console.log('Received content:', data.content);
+   * });
+   * // Later: unsubscribe();
+   */
+  on(messageType: string, handler: (data: Record<string, unknown>) => void): () => void
+
+  /**
+   * Remove a message listener
+   * @param messageType - The message type
+   * @param handler - The handler to remove
+   */
+  off(messageType: string, handler: (data: Record<string, unknown>) => void): void
+
+  /**
+   * Get the parent window's origin (for debugging)
+   * @returns Parent origin string or null if not established
+   */
+  getParentOrigin(): string | null
+}
+
+/**
  * File system API (restricted to repository directory)
  */
 export interface FsAPI {
@@ -379,6 +418,9 @@ export interface GittonPluginAPI {
 
   /** File system API */
   readonly fs: FsAPI
+
+  /** PostMessage API for safe communication with parent */
+  readonly postMessage: PostMessageAPI
 
   /** Current context (updated when repository changes) */
   readonly context: GittonContext
