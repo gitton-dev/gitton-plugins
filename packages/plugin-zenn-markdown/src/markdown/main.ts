@@ -1,9 +1,20 @@
 import { render, init } from '../renderer'
 
+// Track CSS load state and content render state
+let cssLoaded = false
+let hasContent = false
+
 // Load zenn-content-css from CDN
 const zennCssLink = document.createElement('link')
 zennCssLink.rel = 'stylesheet'
 zennCssLink.href = 'https://unpkg.com/zenn-content-css@0.4.5/lib/index.css'
+zennCssLink.onload = () => {
+  cssLoaded = true
+  // Only send resize if content has been rendered
+  if (hasContent) {
+    sendResize()
+  }
+}
 document.head.appendChild(zennCssLink)
 
 // Custom styles
@@ -23,6 +34,43 @@ document.head.appendChild(style)
 // Content container
 const root = document.getElementById('root')!
 root.className = 'znc'
+
+// Send height to parent
+let lastHeight = 0
+let resizeTimeout: number | null = null
+
+function sendResize() {
+  // Only send resize when both CSS is loaded and content exists
+  if (!cssLoaded || !hasContent) return
+
+  // Cancel pending resize
+  if (resizeTimeout) {
+    clearTimeout(resizeTimeout)
+  }
+
+  // Wait for layout to stabilize
+  resizeTimeout = window.setTimeout(() => {
+    requestAnimationFrame(() => {
+      const height = document.body.scrollHeight
+      // Only send if height changed
+      if (height !== lastHeight && height > 0) {
+        lastHeight = height
+        window.gitton.postMessage.send({
+          type: 'gitton:custom',
+          pluginId: window.gitton.pluginId,
+          messageType: 'resize',
+          payload: { height }
+        })
+      }
+    })
+  }, 50)
+}
+
+// Watch for height changes with ResizeObserver
+const resizeObserver = new ResizeObserver(() => {
+  sendResize()
+})
+resizeObserver.observe(root)
 
 // Apply theme helper - uses zenn-content-css data-theme attribute
 function applyTheme(theme: string) {
@@ -51,18 +99,14 @@ window.addEventListener('message', async (event) => {
       try {
         const html = await render(payload.content as string, payload.options || {})
         root.innerHTML = html
+        hasContent = true
 
-        // Send height back to parent for auto-resize
-        const height = document.body.scrollHeight
-        window.gitton.postMessage.send({
-          type: 'gitton:custom',
-          pluginId: window.gitton.pluginId,
-          messageType: 'resize',
-          payload: { height }
-        })
+        // Send resize after render
+        sendResize()
       } catch (error) {
         console.error('Render error:', error)
         root.innerHTML = '<pre style="color:red;">' + (error as Error).message + '</pre>'
+        hasContent = true
       }
     }
   }
