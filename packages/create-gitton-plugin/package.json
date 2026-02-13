@@ -1,6 +1,6 @@
 {
   "name": "create-gitton-plugin",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "Create a new Gitton plugin with interactive prompts",
   "type": "module",
   "bin": {
