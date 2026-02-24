@@ -1,6 +1,6 @@
 {
   "name": "@gitton-dev/plugin-browser",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Open localhost URLs in your default browser from Gitton",
   "type": "module",
   "scripts": {
@@ -36,12 +36,18 @@
       "allowedDomains": [
         {
           "domain": "http://localhost:*",
-          "types": ["frame", "connect"],
+          "types": [
+            "frame",
+            "connect"
+          ],
           "description": "Allow localhost URLs for browser preview"
         },
         {
           "domain": "http://127.0.0.1:*",
-          "types": ["frame", "connect"],
+          "types": [
+            "frame",
+            "connect"
+          ],
           "description": "Allow localhost URLs for browser preview"
         }
       ]
@@ -54,12 +60,19 @@
           "items": {
             "type": "object",
             "properties": {
-              "name": { "type": "string" },
-              "url": { "type": "string" }
+              "name": {
+                "type": "string"
+              },
+              "url": {
+                "type": "string"
+              }
             }
           },
           "default": [
-            { "name": "Dev Server", "url": "http://localhost:3000" }
+            {
+              "name": "Dev Server",
+              "url": "http://localhost:3000"
+            }
           ]
         }
       }
