@@ -1,69 +1,29 @@
-import path from 'path'
-import fs from 'fs/promises'
-import os from 'os'
 import chalk from 'chalk'
-
-function getPluginsDir(isDev: boolean): string {
-  const platform = os.platform()
-  const homeDir = os.homedir()
-
-  let appDataDir: string
-  if (platform === 'darwin') {
-    appDataDir = path.join(homeDir, 'Library', 'Application Support', 'gitton')
-  } else if (platform === 'win32') {
-    appDataDir = path.join(process.env.APPDATA || path.join(homeDir, 'AppData', 'Roaming'), 'gitton')
-  } else {
-    appDataDir = path.join(homeDir, '.config', 'gitton')
-  }
-
-  return path.join(appDataDir, isDev ? 'plugins-dev' : 'plugins')
-}
+import { uninstall as uninstallApi, list as listApi } from '../lib/api.js'
 
 export async function uninstall(packageName: string, options: { dev?: boolean }) {
-  const pluginsDir = getPluginsDir(options.dev ?? false)
-
-  // Normalize package name
-  let searchName = packageName
-  if (!packageName.startsWith('@') && !packageName.includes('/')) {
-    searchName = `@gitton-dev/plugin-${packageName}`
-  }
-
-  // Find the plugin directory
-  const pluginDirName = searchName.replace('/', '-')
-  const pluginDir = path.join(pluginsDir, pluginDirName)
+  console.log(chalk.blue(`Uninstalling ${packageName}...`))
 
   try {
-    // Check if plugin exists
-    await fs.access(pluginDir)
+    const result = await uninstallApi(packageName, options)
 
-    // Read plugin info before deleting
-    try {
-      const packageJsonPath = path.join(pluginDir, 'package.json')
-      const content = await fs.readFile(packageJsonPath, 'utf-8')
-      const pkg = JSON.parse(content)
-      console.log(chalk.blue(`Uninstalling ${pkg.gitton?.displayName || pkg.name}...`))
-    } catch {
-      console.log(chalk.blue(`Uninstalling ${searchName}...`))
-    }
-
-    // Remove the plugin directory
-    await fs.rm(pluginDir, { recursive: true, force: true })
-
-    console.log(chalk.green(`✓ Uninstalled ${searchName}`))
+    console.log(chalk.green(`✓ Uninstalled ${result.name}`))
     console.log('')
     console.log(chalk.yellow('Note: Restart Gitton to apply changes.'))
   } catch (error) {
-    if ((error as NodeJS.ErrnoException).code === 'ENOENT') {
+    if ((error as Error).message.includes('is not installed')) {
       console.error(chalk.red(`Error: Plugin "${packageName}" is not installed`))
 
       // List installed plugins
       console.log('')
       console.log('Installed plugins:')
       try {
-        const entries = await fs.readdir(pluginsDir, { withFileTypes: true })
-        for (const entry of entries) {
-          if (entry.isDirectory() && !entry.name.startsWith('.')) {
-            console.log(chalk.gray(`  - ${entry.name}`))
+        const { plugins } = await listApi(options)
+        if (plugins.length === 0) {
+          console.log(chalk.gray('  (none)'))
+        } else {
+          for (const plugin of plugins) {
+            console.log(chalk.gray(`  - ${plugin.name}`))
           }
         }
       } catch {

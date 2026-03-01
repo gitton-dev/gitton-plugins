@@ -6,10 +6,18 @@
   "bin": {
     "gitton": "./dist/index.js"
   },
+  "main": "./dist/api.js",
+  "types": "./dist/api.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/api.d.ts",
+      "import": "./dist/api.js"
+    }
+  },
   "scripts": {
     "generate": "tsx scripts/generate-plugin-list.ts",
-    "build": "pnpm generate && tsup src/index.ts --format esm --dts --clean",
-    "dev": "pnpm generate && tsup src/index.ts --format esm --watch",
+    "build": "pnpm generate && tsup src/index.ts src/api.ts --format esm --dts --clean",
+    "dev": "pnpm generate && tsup src/index.ts src/api.ts --format esm --dts --watch",
     "clean": "rm -rf dist src/generated"
   },
   "files": [

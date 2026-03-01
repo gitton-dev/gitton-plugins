@@ -1,21 +1,11 @@
 import chalk from 'chalk'
-import { availablePlugins } from '../generated/plugins.js'
+import { search as searchApi } from '../lib/api.js'
 
 export async function search(query?: string) {
   console.log(chalk.blue('Available Gitton plugins:'))
   console.log('')
 
-  let plugins = availablePlugins
-
-  if (query) {
-    const q = query.toLowerCase()
-    plugins = plugins.filter(
-      (p) =>
-        p.shortName.toLowerCase().includes(q) ||
-        p.name.toLowerCase().includes(q) ||
-        p.description.toLowerCase().includes(q)
-    )
-  }
+  const plugins = searchApi(query)
 
   if (plugins.length === 0) {
     console.log(chalk.gray('No plugins found.'))

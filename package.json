@@ -8,6 +8,7 @@
     "dev": "turbo dev",
     "lint": "turbo lint",
     "clean": "turbo clean",
+    "generate:plugins": "npx tsx scripts/generate-plugin-list.ts",
     "publish:all": "pnpm build && pnpm -r publish --access public"
   },
   "devDependencies": {

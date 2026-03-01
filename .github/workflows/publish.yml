@@ -50,6 +50,7 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           pnpm -r exec npm version ${{ inputs.version_type }} --no-git-tag-version
+          npx tsx scripts/generate-plugin-list.ts
           git add -A
           git commit -m "chore(release): bump version (${{ inputs.version_type }})"
           git push
